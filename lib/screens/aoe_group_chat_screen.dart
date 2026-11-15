@@ -96,6 +96,7 @@ class _AoeGroupChatScreenState extends State<AoeGroupChatScreen> {
   static const Color _gold = Color(0xFFBA9A45);
 
   final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   bool _showEmojiPicker = false;
   String _postingAsRole = 'MEMBER'; // 'MEMBER', 'GROUP_ADMIN', 'SUPER_BOSS'
 
@@ -225,6 +226,7 @@ class _AoeGroupChatScreenState extends State<AoeGroupChatScreen> {
   @override
   void dispose() {
     _messageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -298,6 +300,11 @@ class _AoeGroupChatScreenState extends State<AoeGroupChatScreen> {
       _messages.add(newMessage);
       _messageController.clear();
       _showEmojiPicker = false;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
     });
   }
 
@@ -537,6 +544,7 @@ class _AoeGroupChatScreenState extends State<AoeGroupChatScreen> {
           // Chat Messages List
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               itemCount: _messages.length,
               itemBuilder: (ctx, index) {

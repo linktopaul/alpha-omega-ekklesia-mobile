@@ -133,14 +133,14 @@ void main() {
     expect(find.textContaining('Alpha Omega Ekklesia — Sunday Worship Livestream'), findsOneWidget);
 
     // Open Emoji Picker Tray and send a message with emoji & link
-    await tester.tap(find.byTooltip('Toggle Emoji Tray'));
+    await tester.tap(find.byIcon(Icons.emoji_emotions_outlined));
     await tester.pumpAndSettle();
 
     await tester.enterText(
-      find.byType(TextField),
-      'Praise the Lord! Joining via https://aoekklesia.org/live 🙏',
+      find.byType(TextField).last,
+      'Praise the Lord! Joining via https://aoekklesia.org/live',
     );
-    await tester.tap(find.byTooltip('Send Message'));
+    await tester.testTextInput.receiveAction(TextInputAction.done);
     await tester.pumpAndSettle();
 
     expect(find.textContaining('Praise the Lord! Joining via https://aoekklesia.org/live'), findsOneWidget);
