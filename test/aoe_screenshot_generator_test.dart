@@ -16,6 +16,8 @@ Future<void> _loadFonts() async {
       r'C:\Windows\Fonts\segoeuii.ttf',
       r'C:\Windows\Fonts\segoeuiz.ttf',
       r'C:\Windows\Fonts\seguisb.ttf',
+      r'C:\Windows\Fonts\seguiemj.ttf',
+      r'C:\Windows\Fonts\seguisym.ttf',
     ],
     'Segoe UI': [
       r'C:\Windows\Fonts\segoeui.ttf',
@@ -116,5 +118,16 @@ void main() {
     await tester.tap(find.textContaining('Group Approvals'));
     await tester.pumpAndSettle();
     await _captureScreen(tester, repaintKey, '08_aoe_group_admin_approvals.png');
+
+    // 9. WhatsApp-style Fellowship Group Chat (Emojis + Shared Links)
+    await tester.tap(find.text('All 7 Groups'));
+    await tester.pumpAndSettle();
+    final openChatBtn = find.text('Open Group Chat (Emojis & Links)').first;
+    await tester.ensureVisible(openChatBtn);
+    await tester.tap(openChatBtn);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Toggle Emoji Tray'));
+    await tester.pumpAndSettle();
+    await _captureScreen(tester, repaintKey, '09_aoe_fellowship_group_chat.png');
   });
 }

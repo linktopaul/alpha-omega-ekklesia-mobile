@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'aoe_group_chat_screen.dart';
 
 class GroupJoinRequest {
   final String memberName;
@@ -218,6 +219,23 @@ class _AoeFellowshipGroupsScreenState extends State<AoeFellowshipGroupsScreen> {
 
   int get _totalPendingRequests =>
       _groups.fold(0, (sum, g) => sum + g.pendingRequests.length);
+
+  void _openGroupChat(FellowshipGroupRecord group) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => AoeGroupChatScreen(
+          groupId: group.groupId,
+          groupName: group.name,
+          groupAdminName: group.groupAdminName,
+          groupAdminMemberId: group.groupAdminMemberId,
+          memberCount: group.activeMemberCount,
+          accentColor: group.accentColor,
+          groupIcon: group.icon,
+        ),
+      ),
+    );
+  }
 
   void _requestToJoinGroup(int index) {
     final group = _groups[index];
@@ -727,7 +745,7 @@ class _AoeFellowshipGroupsScreenState extends State<AoeFellowshipGroupsScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              if (isJoined)
+              if (isJoined) ...[
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(
@@ -758,8 +776,30 @@ class _AoeFellowshipGroupsScreenState extends State<AoeFellowshipGroupsScreen> {
                       ),
                     ],
                   ),
-                )
-              else if (isPending)
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: _navy,
+                      padding: const EdgeInsets.symmetric(vertical: 11),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: () => _openGroupChat(group),
+                    icon: const Icon(Icons.chat_bubble_outline, size: 17),
+                    label: const Text(
+                      'Open Group Chat (Emojis & Links)',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ] else if (isPending)
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(

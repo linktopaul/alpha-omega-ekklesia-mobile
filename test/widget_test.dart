@@ -115,6 +115,35 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('into 1. Sunday School by Super Boss: Pastor Larry Joshua Augustus'), findsOneWidget);
+
+    // Switch back to All 7 Groups and open Sunday School Group Chat
+    await tester.ensureVisible(find.text('All 7 Groups'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('All 7 Groups'));
+    await tester.pumpAndSettle();
+
+    final openChatBtn = find.text('Open Group Chat (Emojis & Links)').first;
+    await tester.ensureVisible(openChatBtn);
+    await tester.tap(openChatBtn);
+    await tester.pumpAndSettle();
+
+    // Verify WhatsApp-style Group Chat screen with Super Boss & Group Admin messages, Emojis, and Shared Links
+    expect(find.text('SUPER BOSS · PASTOR'), findsWidgets);
+    expect(find.text('GROUP ADMIN'), findsOneWidget);
+    expect(find.textContaining('Alpha Omega Ekklesia — Sunday Worship Livestream'), findsOneWidget);
+
+    // Open Emoji Picker Tray and send a message with emoji & link
+    await tester.tap(find.byTooltip('Toggle Emoji Tray'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byType(TextField),
+      'Praise the Lord! Joining via https://aoekklesia.org/live 🙏',
+    );
+    await tester.tap(find.byTooltip('Send Message'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Praise the Lord! Joining via https://aoekklesia.org/live'), findsOneWidget);
   });
 
   test('AlphaOmegaEkklesiaConfig verifies proper theme tokens and UPI vpa', () {
