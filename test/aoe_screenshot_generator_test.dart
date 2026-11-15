@@ -129,5 +129,14 @@ void main() {
     await tester.tap(find.byTooltip('Toggle Emoji Tray'));
     await tester.pumpAndSettle();
     await _captureScreen(tester, repaintKey, '09_aoe_fellowship_group_chat.png');
+
+    // 10. Birthdays, Anniversaries & Baptism Reminders + Wishing Wall
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Home'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Celebrations (3)'));
+    await tester.pumpAndSettle();
+    await _captureScreen(tester, repaintKey, '10_aoe_celebrations_wishes.png');
   });
 }

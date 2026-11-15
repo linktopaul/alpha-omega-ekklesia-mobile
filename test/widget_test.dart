@@ -144,6 +144,33 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('Praise the Lord! Joining via https://aoekklesia.org/live'), findsOneWidget);
+
+    // Pop back from Group Chat and navigate to Home -> Celebrations (Birthdays, Anniversaries & Baptisms)
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Home'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Birthdays, Anniversaries & Baptisms'), findsOneWidget);
+    await tester.tap(find.text('Celebrations (3)'));
+    await tester.pumpAndSettle();
+
+    // Verify Birthday, Anniversary, and Baptism reminders are displayed
+    expect(find.text('BIRTHDAY REMINDER'), findsWidgets);
+    expect(find.text('ANNIVERSARY REMINDER'), findsOneWidget);
+    expect(find.text('BAPTISM REMINDER'), findsWidgets);
+    expect(find.text('Aaron Fernandez'), findsOneWidget);
+    expect(find.text('Desmond & Lorraine Fernandez'), findsOneWidget);
+    expect(find.text("Winfred D'Cruz"), findsWidgets);
+
+    // Send a quick wish on Aaron's Birthday
+    final wishChip = find.text('Happy Birthday! God Bless You!').first;
+    await tester.ensureVisible(wishChip);
+    await tester.tap(wishChip);
+    await tester.pumpAndSettle();
+
+    expect(find.text('19 Wishes'), findsOneWidget);
   });
 
   test('AlphaOmegaEkklesiaConfig verifies proper theme tokens and UPI vpa', () {
