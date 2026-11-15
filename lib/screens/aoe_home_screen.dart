@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../config/church_config.dart';
+import 'aoe_beta_feedback_screen.dart';
 import 'aoe_celebrations_screen.dart';
 
 class AoeHomeScreen extends StatelessWidget {
@@ -65,11 +66,13 @@ class AoeHomeScreen extends StatelessWidget {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.only(right: 6),
             child: TextButton.icon(
               style: TextButton.styleFrom(
                 backgroundColor: const Color(0xFFFBF4DC),
                 foregroundColor: const Color(0xFF92400E),
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                   side: BorderSide(color: gold.withValues(alpha: 0.45)),
@@ -82,10 +85,37 @@ class AoeHomeScreen extends StatelessWidget {
                   ),
                 );
               },
-              icon: const Icon(Icons.cake_outlined, size: 16),
+              icon: const Icon(Icons.cake_outlined, size: 15),
               label: const Text(
                 'Celebrations (3)',
-                style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: TextButton.icon(
+              style: TextButton.styleFrom(
+                backgroundColor: const Color(0xFFEEF2FF),
+                foregroundColor: navy,
+                visualDensity: VisualDensity.compact,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                  side: const BorderSide(color: Color(0xFFC7D2FE)),
+                ),
+              ),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const AoeBetaFeedbackScreen(),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.mic_none_outlined, size: 15),
+              label: const Text(
+                'Beta AI',
+                style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
               ),
             ),
           ),
@@ -289,6 +319,88 @@ class AoeHomeScreen extends StatelessWidget {
                         style: TextStyle(
                           color: Color(0xFFFEF08A),
                           fontSize: 11.5,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // AI Multimodal Beta Feedback (Voice Note + Screenshot -> Owner Review -> GitHub Issues)
+            InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const AoeBetaFeedbackScreen(),
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFCBD5E1)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(9),
+                      decoration: BoxDecoration(
+                        color: navy.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.auto_awesome,
+                        color: navy,
+                        size: 20,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Beta Feedback (Voice + Screenshot -> AI)',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13.5,
+                              color: navy,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Record voice note & screenshot -> LLM drafts spec -> Owner approves to GitHub Issues',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF475569),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF15803D),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text(
+                        'Review (2)',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

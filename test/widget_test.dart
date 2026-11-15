@@ -171,6 +171,30 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('19 Wishes'), findsOneWidget);
+
+    // Pop back to Home and open AI Beta Feedback (Voice + Screenshot -> LLM -> Owner Review -> GitHub Issues)
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Beta AI'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('AI Beta Feedback & GitHub Issues'), findsOneWidget);
+    expect(find.text('1. Voice Note'), findsOneWidget);
+    expect(find.text('2. Screenshot'), findsOneWidget);
+    expect(find.text('AI-Synthesized GitHub Issue Draft'), findsOneWidget);
+
+    // Switch to Owner Review Queue and approve a pending item to create a GitHub Issue
+    await tester.tap(find.textContaining('2. Review Queue'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Review Voice + Screenshot Feedback Before GitHub'), findsOneWidget);
+    final approveGithubBtn = find.text('Approve & Create GitHub Issue').first;
+    await tester.ensureVisible(approveGithubBtn);
+    await tester.tap(approveGithubBtn);
+    await tester.pumpAndSettle();
+
+    expect(find.text('APPROVED · GITHUB ISSUE #2'), findsOneWidget);
   });
 
   test('AlphaOmegaEkklesiaConfig verifies proper theme tokens and UPI vpa', () {

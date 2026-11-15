@@ -138,5 +138,17 @@ void main() {
     await tester.tap(find.text('Celebrations (3)'));
     await tester.pumpAndSettle();
     await _captureScreen(tester, repaintKey, '10_aoe_celebrations_wishes.png');
+
+    // 11. AI Beta Feedback: Voice Note + Screenshot -> Multimodal LLM Issue Draft
+    await tester.pageBack();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Beta AI'));
+    await tester.pumpAndSettle();
+    await _captureScreen(tester, repaintKey, '11_aoe_beta_voice_screenshot_llm.png');
+
+    // 12. Owner Review Queue -> Approve & Create GitHub Issue
+    await tester.tap(find.textContaining('2. Review Queue'));
+    await tester.pumpAndSettle();
+    await _captureScreen(tester, repaintKey, '12_aoe_beta_owner_github_review.png');
   });
 }
