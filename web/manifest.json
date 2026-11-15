@@ -1,11 +1,11 @@
 {
-    "name": "alpha_omega_ekklesia_mobile",
-    "short_name": "alpha_omega_ekklesia_mobile",
+    "name": "Alpha Omega Ekklesia",
+    "short_name": "AO Ekklesia",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F8FAFC",
+    "theme_color": "#18284A",
+    "description": "Official Mobile & Web App for Alpha Omega Ekklesia (Chennai, India) — Pastors Larry & Soma Augustus.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
