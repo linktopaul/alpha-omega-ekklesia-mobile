@@ -90,6 +90,31 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('Issued ID: AOE-FAM-2026-003'), findsOneWidget);
+
+    // Tap Groups tab (7 Fellowship Groups)
+    await tester.tap(find.text('Groups'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Fellowship Groups (7)'), findsOneWidget);
+    expect(find.text('Pastors Larry & Soma Augustus (Super Bosses)'), findsOneWidget);
+    expect(find.text('1. Sunday School'), findsOneWidget);
+    expect(find.text("2. Men's Fellowship"), findsOneWidget);
+    expect(find.text("3. Women's Fellowship"), findsOneWidget);
+
+    // Switch to Group Approvals (Admin & Super Boss Desk)
+    await tester.tap(find.textContaining('Group Approvals'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Fellowship Group Approval Authority'), findsOneWidget);
+    expect(find.text('Super Boss Roster: Group Admins (7 Groups)'), findsOneWidget);
+
+    // Approve a pending member join request into Sunday School
+    final groupApproveBtn = find.text('Approve into 1. Sunday School');
+    await tester.ensureVisible(groupApproveBtn);
+    await tester.tap(groupApproveBtn);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('into 1. Sunday School by Super Boss: Pastor Larry Joshua Augustus'), findsOneWidget);
   });
 
   test('AlphaOmegaEkklesiaConfig verifies proper theme tokens and UPI vpa', () {

@@ -106,5 +106,15 @@ void main() {
     await tester.tap(find.textContaining('Pastoral Admin'));
     await tester.pumpAndSettle();
     await _captureScreen(tester, repaintKey, '06_aoe_pastoral_approval_queue.png');
+
+    // 7. Fellowship Groups (All 7 Official Groups)
+    await tester.tap(find.text('Groups'));
+    await tester.pumpAndSettle();
+    await _captureScreen(tester, repaintKey, '07_aoe_fellowship_groups.png');
+
+    // 8. Fellowship Group Approvals & Super Boss Roster
+    await tester.tap(find.textContaining('Group Approvals'));
+    await tester.pumpAndSettle();
+    await _captureScreen(tester, repaintKey, '08_aoe_group_admin_approvals.png');
   });
 }
