@@ -1,0 +1,28 @@
+name: alpha_omega_ekklesia_mobile
+description: "Alpha Omega Ekklesia mobile client application."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: ">=3.19.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  church_digital_platform_mobile:
+    path: ../Church-Digital-Platform/mobile
+  cupertino_icons: ^1.0.8
+  provider: ^6.1.5+1
+  intl: ^0.20.3
+  url_launcher: ^6.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/branding/
