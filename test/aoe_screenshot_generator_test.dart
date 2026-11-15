@@ -6,19 +6,40 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:alpha_omega_ekklesia_mobile/main.dart';
 
-const String outDir = r'C:\Users\linkt\.gemini\antigravity\brain\20fabf14-68ca-4c2a-b25d-f1d6800c9a11\demo_slides_aoe';
+const String outDir = r'C:\Users\linkt\.gemini\antigravity\brain\29b7c671-ad3c-454f-bb0a-b365177c66a2\demo_slides_aoe';
 
 Future<void> _loadFonts() async {
-  final fontFiles = {
-    'Segoe UI': r'C:\Windows\Fonts\segoeui.ttf',
-    'Roboto': r'C:\Windows\Fonts\arial.ttf',
+  final fontMap = <String, List<String>>{
+    'Roboto': [
+      r'C:\Windows\Fonts\segoeui.ttf',
+      r'C:\Windows\Fonts\segoeuib.ttf',
+      r'C:\Windows\Fonts\segoeuii.ttf',
+      r'C:\Windows\Fonts\segoeuiz.ttf',
+      r'C:\Windows\Fonts\seguisb.ttf',
+    ],
+    'Segoe UI': [
+      r'C:\Windows\Fonts\segoeui.ttf',
+      r'C:\Windows\Fonts\segoeuib.ttf',
+      r'C:\Windows\Fonts\segoeuii.ttf',
+      r'C:\Windows\Fonts\seguisb.ttf',
+    ],
+    'MaterialIcons': [
+      r'C:\Users\linkt\dev\flutter\bin\cache\artifacts\material_fonts\MaterialIcons-Regular.otf',
+    ],
   };
-  for (final entry in fontFiles.entries) {
-    final file = File(entry.value);
-    if (file.existsSync()) {
-      final bytes = file.readAsBytesSync();
-      final loader = FontLoader(entry.key);
-      loader.addFont(Future.value(ByteData.sublistView(bytes)));
+
+  for (final entry in fontMap.entries) {
+    final loader = FontLoader(entry.key);
+    var loadedAny = false;
+    for (final path in entry.value) {
+      final file = File(path);
+      if (file.existsSync()) {
+        final bytes = file.readAsBytesSync();
+        loader.addFont(Future.value(ByteData.sublistView(bytes)));
+        loadedAny = true;
+      }
+    }
+    if (loadedAny) {
       await loader.load();
     }
   }
@@ -75,5 +96,15 @@ void main() {
     await tester.tap(find.text('Worship'));
     await tester.pumpAndSettle();
     await _captureScreen(tester, repaintKey, '04_aoe_worship_setlists.png');
+
+    // 5. Member View: Digital Family Membership ID Card
+    await tester.tap(find.text('Members & ID'));
+    await tester.pumpAndSettle();
+    await _captureScreen(tester, repaintKey, '05_aoe_member_family_id_card.png');
+
+    // 6. Pastoral Admin View: Pastors Larry & Soma Approval Queue
+    await tester.tap(find.textContaining('Pastoral Admin'));
+    await tester.pumpAndSettle();
+    await _captureScreen(tester, repaintKey, '06_aoe_pastoral_approval_queue.png');
   });
 }

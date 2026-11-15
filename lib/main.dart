@@ -5,6 +5,7 @@ import 'screens/aoe_home_screen.dart';
 import 'screens/aoe_giving_screen.dart';
 import 'screens/aoe_prayer_screen.dart';
 import 'screens/aoe_worship_screen.dart';
+import 'screens/aoe_membership_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,6 +47,7 @@ class _AoeMainNavigationState extends State<AoeMainNavigation> {
       const AoeGivingScreen(),
       const AoePrayerScreen(),
       const AoeWorshipScreen(),
+      const AoeMembershipScreen(),
     ];
 
     return Scaffold(
@@ -76,6 +78,11 @@ class _AoeMainNavigationState extends State<AoeMainNavigation> {
             icon: Icon(Icons.library_music_outlined),
             selectedIcon: Icon(Icons.library_music),
             label: 'Worship',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.badge_outlined),
+            selectedIcon: Icon(Icons.badge),
+            label: 'Members & ID',
           ),
         ],
       ),

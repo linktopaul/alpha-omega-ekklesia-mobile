@@ -66,6 +66,30 @@ void main() {
     expect(find.text('Hymns & Worship Setlists'), findsOneWidget);
     expect(find.text('Great Is Thy Faithfulness'), findsOneWidget);
     expect(find.textContaining('Classic Anglo-Indian Hymn'), findsOneWidget);
+
+    // Tap Members & ID tab
+    await tester.tap(find.text('Members & ID'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Membership & Family ID'), findsOneWidget);
+    expect(find.text('PASTORAL APPROVED MEMBER'), findsOneWidget);
+    expect(find.text('AOE-FAM-2026-002'), findsWidgets);
+    expect(find.text('AOE-FAM-2026-002-H1'), findsOneWidget);
+
+    // Switch to Pastoral Admin view (Larry & Soma)
+    await tester.tap(find.textContaining('Pastoral Admin'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Pastoral Approval Desk — Alpha Omega Ekklesia'), findsOneWidget);
+    expect(find.text("The D'Cruz Family"), findsOneWidget);
+
+    // Approve a pending family and verify unique Family ID AOE-FAM-2026-003 is issued
+    final approveBtn = find.text('Approve & Issue Family ID (AOE-FAM-2026-003)').first;
+    await tester.ensureVisible(approveBtn);
+    await tester.tap(approveBtn);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Issued ID: AOE-FAM-2026-003'), findsOneWidget);
   });
 
   test('AlphaOmegaEkklesiaConfig verifies proper theme tokens and UPI vpa', () {

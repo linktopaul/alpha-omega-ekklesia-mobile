@@ -21,7 +21,7 @@ abstract final class AlphaOmegaEkklesiaConfig {
     hairlineBorder: Color(0xFFE2E8F0), // Subtle hairline
     ink: Color(0xFF0F172A),
     inkMuted: Color(0xFF475569),
-    fontFamily: null, // Dignified modern sans
+    fontFamily: 'Roboto', // Dignified modern sans
     cardRadius: 16.0,
   );
 
