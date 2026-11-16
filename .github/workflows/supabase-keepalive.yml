@@ -1,0 +1,28 @@
+name: Supabase Free-Tier Keep-Alive Ping
+
+on:
+  schedule:
+    # Runs at 04:00 UTC (09:30 AM IST) every 3 days to prevent 7-day free-tier inactivity pause
+    - cron: '0 4 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  ping-supabase:
+    name: Ping Alpha Omega Ekklesia Supabase DB (ap-south-1)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query aoe_fellowship_groups to keep PostgreSQL active
+        env:
+          SUPABASE_URL: https://mrvadoykahqrlnqdvmmf.supabase.co
+          SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ydmFkb3lrYWhxcmxucWR2bW1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ4MTMyODQsImV4cCI6MjExMDM4OTI4NH0.0OE7lsBjTbXAcST75sFH9UBwsWVbfNwTUI5u27NNznM
+        run: |
+          HTTP_STATUS=$(curl -s -o /tmp/supabase_ping.json -w "%{http_code}" \
+            "${SUPABASE_URL}/rest/v1/aoe_fellowship_groups?select=group_id,name&limit=1" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")
+          echo "Supabase Keep-Alive HTTP Status: ${HTTP_STATUS}"
+          cat /tmp/supabase_ping.json
+          if [ "${HTTP_STATUS}" -lt 200 ] || [ "${HTTP_STATUS}" -ge 300 ]; then
+            echo "Keep-alive ping returned non-2xx status: ${HTTP_STATUS}"
+            exit 1
+          fi
