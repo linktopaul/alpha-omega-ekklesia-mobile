@@ -25,11 +25,12 @@ class AoeSupabaseService {
 
   String _supabaseUrl = const String.fromEnvironment(
     'SUPABASE_URL',
-    defaultValue: 'https://aoe-chennai-church.supabase.co',
+    defaultValue: 'https://mrvadoykahqrlnqdvmmf.supabase.co',
   );
   String _supabaseAnonKey = const String.fromEnvironment(
     'SUPABASE_ANON_KEY',
-    defaultValue: '',
+    defaultValue:
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ydmFkb3lrYWhxcmxucWR2bW1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ4MTMyODQsImV4cCI6MjExMDM4OTI4NH0.0OE7lsBjTbXAcST75sFH9UBwsWVbfNwTUI5u27NNznM',
   );
   String _githubPat = const String.fromEnvironment(
     'GITHUB_PAT',
@@ -142,6 +143,28 @@ class AoeSupabaseService {
       );
     } catch (_) {}
     return publicUrl;
+  }
+
+  /// Fetches all multimodal beta feedback items from Supabase PostgreSQL `public.aoe_beta_feedback_queue`.
+  Future<List<Map<String, dynamic>>> fetchFeedbackQueue() async {
+    if (!isCloudConfigured) {
+      return const [];
+    }
+    try {
+      final response = await http.get(
+        Uri.parse('$postgrestTableEndpoint?select=*&order=submitted_at.desc'),
+        headers: {
+          'apikey': _supabaseAnonKey,
+          'Authorization': 'Bearer $_supabaseAnonKey',
+          'Accept': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body) as List<dynamic>;
+        return decoded.cast<Map<String, dynamic>>();
+      }
+    } catch (_) {}
+    return const [];
   }
 
   /// Inserts a new multimodal feedback row into Supabase PostgreSQL `public.aoe_beta_feedback_queue`
