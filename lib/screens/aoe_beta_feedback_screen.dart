@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/aoe_supabase_service.dart';
 
 enum BetaFeedbackStatus {
   pendingReview('PENDING YOUR REVIEW', Color(0xFFB45309), Color(0xFFFEF3C7)),
@@ -143,6 +144,7 @@ class _AoeBetaFeedbackScreenState extends State<AoeBetaFeedbackScreen> {
   void initState() {
     super.initState();
     _activeTab = widget.initialTabIndex;
+    AoeSupabaseService.instance.loadConfiguration();
     _reviewQueue = [
       const BetaFeedbackItem(
         id: 'AOE-BETA-001',
@@ -338,13 +340,40 @@ class _AoeBetaFeedbackScreenState extends State<AoeBetaFeedbackScreen> {
       _activeTab = 1; // Switch to Owner Review Queue so user sees it immediately
     });
 
+    // Persist to Supabase Storage (aoe-beta-voice-notes + aoe-beta-screenshots) & PostgreSQL (aoe_beta_feedback_queue)
+    final supa = AoeSupabaseService.instance;
+    supa.uploadVoiceNote(fileName: newItem.voiceFileName);
+    supa.uploadScreenshot(fileName: newItem.screenshotFileName);
+    supa.insertFeedbackRow({
+      'id': newItem.id,
+      'submitter_name': newItem.submitterName,
+      'submitter_role': newItem.submitterRole,
+      'family_id': newItem.familyId,
+      'module_name': newItem.moduleName,
+      'target_file': newItem.targetFile,
+      'voice_file_name': newItem.voiceFileName,
+      'voice_storage_url':
+          '${supa.storageVoiceEndpoint}/${newItem.voiceFileName}',
+      'voice_duration': newItem.voiceDuration,
+      'voice_transcript': newItem.voiceTranscript,
+      'screenshot_file_name': newItem.screenshotFileName,
+      'screenshot_storage_url':
+          '${supa.storageScreenshotEndpoint}/${newItem.screenshotFileName}',
+      'screenshot_visual_analysis': newItem.screenshotVisualAnalysis,
+      'issue_title': newItem.issueTitle,
+      'issue_category': newItem.issueCategory,
+      'priority': newItem.priority,
+      'acceptance_criteria': newItem.acceptanceCriteria,
+      'status': 'PENDING_REVIEW',
+    });
+
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
           backgroundColor: const Color(0xFF15803D),
           content: Text(
-            'Submitted $newId to Owner Review Queue (Awaiting your approval before GitHub Issue creation).',
+            'Synced $newId to Supabase (PostgreSQL + Storage Buckets) -> Owner Review Queue.',
           ),
         ),
       );
@@ -368,13 +397,36 @@ class _AoeBetaFeedbackScreenState extends State<AoeBetaFeedbackScreen> {
       }).toList();
     });
 
+    final supa = AoeSupabaseService.instance;
+    supa.updateFeedbackStatus(
+      id: item.id,
+      status: 'APPROVED_GITHUB',
+      githubIssueNumber: issueNum,
+      githubIssueUrl: issueUrl,
+    );
+    supa.createGitHubIssueOnApproval(
+      feedbackId: item.id,
+      title: item.issueTitle,
+      submitterName: item.submitterName,
+      submitterRole: item.submitterRole,
+      targetFile: item.targetFile,
+      voiceStorageUrl: '${supa.storageVoiceEndpoint}/${item.voiceFileName}',
+      voiceDuration: item.voiceDuration,
+      voiceTranscript: item.voiceTranscript,
+      screenshotStorageUrl:
+          '${supa.storageScreenshotEndpoint}/${item.screenshotFileName}',
+      screenshotVisualAnalysis: item.screenshotVisualAnalysis,
+      acceptanceCriteria: item.acceptanceCriteria,
+      categoryLabel: item.issueCategory,
+    );
+
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
           backgroundColor: const Color(0xFF15803D),
           content: Text(
-            'Approved ${item.id} -> Created GitHub Issue #$issueNum in linktopaul/alpha-omega-ekklesia-mobile!',
+            'Approved ${item.id} -> Synced Supabase & Created GitHub Issue #$issueNum!',
           ),
         ),
       );
@@ -534,8 +586,108 @@ class _AoeBetaFeedbackScreenState extends State<AoeBetaFeedbackScreen> {
     );
   }
 
+  void _openSupabaseConfigDialog() {
+    final supa = AoeSupabaseService.instance;
+    final urlCtrl = TextEditingController(text: supa.supabaseUrl);
+    final keyCtrl = TextEditingController(text: supa.supabaseAnonKey);
+    final patCtrl = TextEditingController(text: supa.githubPat);
+
+    showDialog<void>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: const Text(
+            'Option 1: Supabase PostgreSQL & Storage Config',
+            style: TextStyle(
+              fontSize: 14.5,
+              fontWeight: FontWeight.bold,
+              color: _navy,
+            ),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  '• Postgres Table: public.aoe_beta_feedback_queue\n'
+                  '• Voice Bucket: aoe-beta-voice-notes (.m4a)\n'
+                  '• Screenshot Bucket: aoe-beta-screenshots (.png)\n'
+                  '• Schema File: supabase/migrations/20261116000000_aoe_supabase_schema.sql',
+                  style: TextStyle(fontSize: 11, color: Color(0xFF334155)),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: urlCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Supabase Project URL',
+                    hintText: 'https://<project-ref>.supabase.co',
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: keyCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Supabase Anon Public Key',
+                    hintText: 'eyJhbGciOiJIUzI1NiIsInR5cCI6...',
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: patCtrl,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'GitHub PAT (Optional — Auto-Create Issues)',
+                    hintText: 'ghp_... or github_pat_...',
+                    border: OutlineInputBorder(),
+                    isDense: true,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(backgroundColor: _navy),
+              onPressed: () async {
+                Navigator.of(ctx).pop();
+                await supa.saveConfiguration(
+                  supabaseUrl: urlCtrl.text,
+                  supabaseAnonKey: keyCtrl.text,
+                  githubPat: patCtrl.text,
+                );
+                if (!mounted) return;
+                setState(() {});
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    const SnackBar(
+                      backgroundColor: Color(0xFF15803D),
+                      content: Text(
+                        'Saved Supabase PostgreSQL & Storage Bucket configuration!',
+                      ),
+                    ),
+                  );
+              },
+              child: const Text('Save & Connect'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final supa = AoeSupabaseService.instance;
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
@@ -555,14 +707,55 @@ class _AoeBetaFeedbackScreenState extends State<AoeBetaFeedbackScreen> {
               ),
             ),
             Text(
-              'Voice Note + Screenshot -> Gemini LLM -> Owner Review Gate',
+              'Supabase PostgreSQL + Storage -> Gemini LLM -> GitHub',
               style: TextStyle(fontSize: 11, color: Color(0xFF64748B)),
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            tooltip: 'Supabase Cloud Config',
+            onPressed: _openSupabaseConfigDialog,
+            icon: Icon(
+              supa.isCloudConfigured
+                  ? Icons.cloud_done
+                  : Icons.storage_outlined,
+              color: const Color(0xFF15803D),
+              size: 20,
+            ),
+          ),
+        ],
       ),
       body: Column(
         children: [
+          // Option 1 Supabase Storage & PostgreSQL Status Bar
+          Container(
+            width: double.infinity,
+            color: const Color(0xFFF0FDF4),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.cloud_done_outlined,
+                  size: 14,
+                  color: Color(0xFF15803D),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'Supabase Storage: ${AoeSupabaseService.voiceBucket} (.m4a) & ${AoeSupabaseService.screenshotBucket} (.png) -> DB: ${AoeSupabaseService.feedbackTable}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF166534),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           // Top Mode Switcher: Tester Capture vs Owner Review Queue
           Container(
             color: Colors.white,
